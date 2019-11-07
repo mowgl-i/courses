@@ -23,7 +23,7 @@ library(mclust)
 
 #Carregando os dados com os textos originais
 #setwd('F:/WAGNER 14.03')
-text <- readLines("PATHNAME ... Correct_Calls2017_Complete.csv")
+text <- readLines("/Users/Joao/Git/courses/unstructured_data/exercise_textmining.csv")
 text <- text[-(1)] #removendo a primeira linha 'history'
 View(text)
 
@@ -55,7 +55,7 @@ corpus <- tm_map(corpus, removeNumbers)
 corpus <- tm_map(corpus, stripWhitespace)
 
 # verificando o corpus
-writeLines(as.character(corpus[[75]]))
+writeLines(as.character(corpus))
 
 
 # gerando matrizes de TD e DT
@@ -69,13 +69,13 @@ head(freq, 15)
 wf <- data.frame(word=names(freq), freq=freq)   
 head(wf)  
 
-p <- ggplot(subset(wf, freq>50), aes(x = reorder(word, -freq), y = freq)) +
+p <- ggplot(subset(wf, freq>5), aes(x = reorder(word, -freq), y = freq)) +
             geom_bar(stat = "identity") +
             theme(axis.text.x=element_text(angle=45, hjust=1))
 p   
 
 set.seed(142)   
-wordcloud(names(freq), freq, min.freq=20) 
+wordcloud(names(freq), freq, min.freq=4) 
 
 
 # Escalonamento Multidimensional com LSA
@@ -118,7 +118,7 @@ library(skmeans)
 
 #Cluster analysis
 set.seed(123456)
-clust<-kmeans(points,20) #dividir estes dados em 3 clusters 
+clust<-kmeans(points,10) #dividir estes dados em 3 clusters 
 clust
 plot(points[,1],points[,2],col= clust$cluster)
 text(points[,1],points[,2],row.names(df))
