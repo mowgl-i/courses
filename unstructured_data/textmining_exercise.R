@@ -23,7 +23,7 @@ library(mclust)
 
 #Carregando os dados com os textos originais
 #setwd('F:/WAGNER 14.03')
-text <- readLines("/Users/Joao/Git/courses/unstructured_data/exercise_textmining.csv")
+text <- readLines("C:/Users/macia/Documents/MSIA-19/Git/courses/unstructured_data/exercise_textmining.csv")
 text <- text[-(1)] #removendo a primeira linha 'history'
 View(text)
 
@@ -38,6 +38,8 @@ df <- data.frame(text, stringsAsFactors=FALSE)
 #View(df)
 corpus <- Corpus(VectorSource(df$text))
 corpus
+
+corpus[[1]]$content
 
 #Limpando os dados
 
@@ -54,6 +56,7 @@ corpus <- tm_map(corpus, removeNumbers)
 #remover espa?o em branco entre as palavras 
 corpus <- tm_map(corpus, stripWhitespace)
 
+
 # verificando o corpus
 writeLines(as.character(corpus))
 
@@ -69,6 +72,7 @@ head(freq, 15)
 wf <- data.frame(word=names(freq), freq=freq)   
 head(wf)  
 
+
 p <- ggplot(subset(wf, freq>5), aes(x = reorder(word, -freq), y = freq)) +
             geom_bar(stat = "identity") +
             theme(axis.text.x=element_text(angle=45, hjust=1))
@@ -80,20 +84,25 @@ wordcloud(names(freq), freq, min.freq=4)
 
 # Escalonamento Multidimensional com LSA
 td.mat <- as.matrix(tdm)
+
 # Ponderando os termos em peso local (lw) e peso global (gw)
+
 td.mat.lsa <- lw_bintf(td.mat) * gw_idf(td.mat) 
+
 #View(td.mat.lsa)
 # criando o espa?o latente (M = T S t(D); a matriz M ? o produto das matrizes de termos "T", documentos "D" e a diagonal "S"
 # de valores singulares
 lsaSpace <- lsa(td.mat.lsa)
 lsaSpace$dk
-#View(lsaSpace)
+View(lsaSpace)
+
 # calculando as dist?ncias
 dist.mat.lsa <- dist(t(as.textmatrix(lsaSpace))) 
 dist.mat.lsa
 
 # Escalonamento Multidimensional com LSA, duas dimens?es (k=2)
 fit <- cmdscale(dist.mat.lsa, eig=TRUE, k=2)
+
 # gerando o gr?fico
 points <- data.frame(x=fit$points[, 1], y=fit$points[, 2])
 ggplot(points,aes(x=x, y=y)) + 
@@ -153,23 +162,25 @@ qgraph(cor_t,layout="spring",labels=colnames(cor_t),threshold=0.3)
 #By Cluster Analysis - Cluster 1 Instruments
 ################################################################################
 # Análise por cluster
-#Corpus
+#Corpus 
 df_c1 <- data.frame(table_final$originalText[which(table_final$class==1)], stringsAsFactors=FALSE)
 # View(df_c1)
-corpus_c1 <- VCorpus(VectorSource(df_c1$table_final.originalText.which.table_final.class....1..))
+corpus_c1 <- VCorpus(VectorSource(df_c1))
 
 # apenas minusculas
-corpus_c1 <- tm_map(corpus_c1, tolower)
+corpus_c1 <- tm_map(corpus_c1, content_transformer(tolower))
 # removendo pontua??es
-corpus_c1 <- tm_map(corpus_c1, removePunctuation)
+corpus_c1 <- tm_map(corpus_c1, content_transformer(removePunctuation))
 # removendo "stopwords"
 corpus_c1 <- tm_map(corpus_c1, function(x) removeWords(x, stopwords("english")))
 # stemiza??o (manter a raiz)
 corpus_c1 <- tm_map(corpus_c1, stemDocument, language = "english")
 #removendo n?meros
-corpus_c1 <- tm_map(corpus_c1, removeNumbers)
+corpus_c1 <- tm_map(corpus_c1, content_transformer(removeNumbers))
 #remover espa?o em branco entre as palavras 
-corpus_c1 <- tm_map(corpus_c1, stripWhitespace)
+corpus_c1 <- tm_map(corpus_c1, content_transformer(stripWhitespace))
+
+writeLines(as.character(corpus_c1))
 
 #criando uma matrix de palavras e frequencia de palavras
 dtm_c1 <- DocumentTermMatrix(corpus_c1)
